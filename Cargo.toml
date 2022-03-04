@@ -1,0 +1,17 @@
+[package]
+name = "etot"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+serialize = ["serde"]
+random = ["rand"]
+
+[dependencies]
+cfg-if = "1"
+serde = { version = "1", features = ["derive"], optional = true }
+rand = { version = "0.8", optional = true }
+
+[dev-dependencies]
+serde_json = "1"
