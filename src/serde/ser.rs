@@ -238,14 +238,14 @@ impl<A,B> Serializer for Either<A,B> where A: Serializer, B: Serializer {
 
 impl<A,B> ::serde::de::Error for Either<A,B> where A: ::serde::de::Error, B: ::serde::de::Error {
     #[inline]
-    fn custom<T> (msg:T) -> Self where T:std::fmt::Display {
+    fn custom<T> (msg:T) -> Self where T:core::fmt::Display {
         Self::Left(A::custom(msg))
     }
 }
 
 impl<A,B> ::serde::ser::Error for Either<A,B> where A: ::serde::ser::Error, B: ::serde::ser::Error {
     #[inline]
-    fn custom<T> (msg:T) -> Self where T:std::fmt::Display {
+    fn custom<T> (msg:T) -> Self where T:core::fmt::Display {
         Self::Left(A::custom(msg))
     }
 }

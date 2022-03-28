@@ -2,7 +2,7 @@ use etot::Either::{self, *};
 
 #[test]
 fn test () {
-    let alpha : Either<String, Vec<u8>> = Left("hello world".to_string());
+    let alpha : Either<String, Vec<u8>> = Right(b"hello world".to_vec());
     let beta : Either<&str, &[u8]> = alpha.as_deref();
-    assert_eq!(beta, Left("hello world"))
+    assert_eq!(beta, Right(b"hello world"))
 }

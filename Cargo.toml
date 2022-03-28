@@ -7,9 +7,11 @@ edition = "2021"
 [features]
 serialize = ["serde"]
 random = ["rand"]
+async = ["futures"]
 
 [dependencies]
 cfg-if = "1"
+futures = { version = "0.3", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 rand = { version = "0.8", optional = true }
 

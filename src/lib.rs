@@ -1,3 +1,5 @@
+#![no_std]
+
 mod lr;
 pub use lr::*;
 
@@ -16,7 +18,14 @@ cfg_if::cfg_if! {
     }
 }
 
-use std::{ops::{Deref, DerefMut}, fmt::Display};
+cfg_if::cfg_if! {
+    if #[cfg(feature = "async")] {
+        mod future;
+        pub use future::*;
+    }
+}
+
+use core::{ops::{Deref, DerefMut}, fmt::Display};
 use self::Either::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -96,6 +105,11 @@ impl<A,B> Either<A,B> {
             Left(x) => Left(x.clone()),
             Right(x) => Right(x.clone())
         }
+    }
+
+    #[inline]
+    pub fn copied (&self) -> Either<A,B> where A: Copy, B: Copy {
+        *self
     }
 
     #[inline]
@@ -290,6 +304,28 @@ impl<A,B> Either<Option<A>, Option<B>> {
     }
 }
 
+impl<A: Deref, B: Deref<Target = A::Target>> Deref for Either<A,B> {
+    type Target = A::Target;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Left(x) => x.deref(),
+            Right(x) => x.deref()
+        }
+    }
+}
+
+impl<A: DerefMut, B: DerefMut<Target = A::Target>> DerefMut for Either<A,B> {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        match self {
+            Left(x) => x.deref_mut(),
+            Right(x) => x.deref_mut()
+        }
+    }
+}
+
 impl<T> From<Option<T>> for Either<T,()> {
     #[inline]
     fn from(x: Option<T>) -> Self {
@@ -332,7 +368,7 @@ impl<T,E> Into<Result<T,E>> for Either<T,E> {
 
 impl<A,B> Display for Either<A,B> where A: Display, B: Display {
     #[inline]
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Left(x) => x.fmt(f),
             Right(x) => x.fmt(f)

@@ -1,4 +1,4 @@
-use std::ops::Deref;
+use core::ops::Deref;
 use crate::*;
 
 pub type LeftRight<T> = Either<T,T>;
@@ -106,21 +106,5 @@ impl<T,E> Either<Result<T,E>,T> {
             Left(Ok(x)) => Ok(x),
             Left(Err(e)) => Err(e)
         }
-    }
-}
-
-impl<T> Deref for LeftRight<T> {
-    type Target = T;
-
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        self.inner_ref()
-    }
-}
-
-impl<T> DerefMut for LeftRight<T> {
-    #[inline]
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.inner_mut()
     }
 }
