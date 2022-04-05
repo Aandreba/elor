@@ -1,7 +1,12 @@
 [package]
 name = "elor"
-version = "0.1.0"
+description = "Base generic implementation of an Either type"
+version = "1.0.0"
 edition = "2021"
+license = "MIT"
+repository = "https://github.com/Aandreba/elor"
+keywords = ["either", "eithers", "either-type", "either-types", "either-type"]
+categories = ["data-structures", "rust-patterns", "no-std"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
