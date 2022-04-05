@@ -28,6 +28,8 @@ cfg_if::cfg_if! {
 use core::{ops::{Deref, DerefMut}, fmt::Display};
 use self::Either::*;
 
+/// Generic data type that represents either a value
+/// that's of one type or another.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serialize", serde(untagged))]
@@ -137,7 +139,7 @@ impl<A,B> Either<A,B> {
     }
 
     #[inline]
-    pub fn ok_left (self) -> Option<A> {
+    pub fn some_left (self) -> Option<A> {
         match self {
             Left(x) => Some(x),
             _ => None
@@ -145,7 +147,7 @@ impl<A,B> Either<A,B> {
     }
 
     #[inline]
-    pub fn ok_right (self) -> Option<B> {
+    pub fn some_right (self) -> Option<B> {
         match self {
             Right(x) => Some(x),
             _ => None
@@ -195,10 +197,34 @@ impl<A,B> Either<A,B> {
     }
 
     #[inline]
-    pub fn fold<T, FA: FnOnce(A) -> T, FB: FnOnce(B) -> T> (self, fa: FA, fb: FB) -> T {
+    pub fn map <X, Y, F: FnOnce(A) -> X, G: FnOnce(B) -> Y> (self, f: F, g: G) -> Either<X,Y> {
         match self {
-            Left(x) => fa(x),
-            Right(x) => fb(x)
+            Left(x) => Left(f(x)),
+            Right(x) => Right(g(x))
+        }
+    }
+
+    #[inline]
+    pub fn map_left<T, F: FnOnce(A) -> T> (self, f: F) -> Either<T,B> {
+        match self {
+            Left(x) => Left(f(x)),
+            Right(x) => Right(x)
+        }
+    }
+
+    #[inline]
+    pub fn map_right<T, F: FnOnce(B) -> T> (self, f: F) -> Either<A,T> {
+        match self {
+            Left(x) => Left(x),
+            Right(x) => Right(f(x))
+        }
+    }
+
+    #[inline]
+    pub fn fold<T, F: FnOnce(A) -> T, G: FnOnce(B) -> T> (self, f: F, g: G) -> T {
+        match self {
+            Left(x) => f(x),
+            Right(x) => g(x)
         }
     }
 
