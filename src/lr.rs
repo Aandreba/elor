@@ -1,6 +1,7 @@
 use core::ops::Deref;
 use crate::*;
 
+/// ```Either``` with the same value on both sides
 pub type LeftRight<T> = Either<T,T>;
 
 impl<T> LeftRight<T> {
