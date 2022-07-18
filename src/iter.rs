@@ -1,3 +1,4 @@
+use core::iter::FusedIterator;
 use crate::prelude::*;
 
 cfg_if::cfg_if! {
@@ -9,6 +10,103 @@ cfg_if::cfg_if! {
         extern crate alloc;
         use alloc::rc::Rc;
         use alloc::collections::VecDeque;
+    }
+}
+
+impl<A: Iterator, B: Iterator> Iterator for Either<A, B> {
+    type Item = Either<A::Item, B::Item>;
+
+    #[inline(always)]
+    fn next(&mut self) -> Option<Self::Item> {
+        match self {
+            Left(x) => x.next().map(Left),
+            Right(x) => x.next().map(Right)
+        }
+    }
+
+    #[inline(always)]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        match self {
+            Left(x) => x.size_hint(),
+            Right(x) => x.size_hint()
+        }
+    }
+}
+
+impl<A: ExactSizeIterator, B: ExactSizeIterator> ExactSizeIterator for Either<A, B> {
+    #[inline(always)]
+    fn len(&self) -> usize {
+        match self {
+            Left(x) => x.len(),
+            Right(x) => x.len()
+        }
+    }
+}
+
+impl<A: DoubleEndedIterator, B: DoubleEndedIterator> DoubleEndedIterator for Either<A, B> {
+    #[inline(always)]
+    fn next_back(&mut self) -> Option<Self::Item> {
+        match self {
+            Left(x) => x.next_back().map(Left),
+            Right(x) => x.next_back().map(Right)
+        }
+    }
+}
+
+impl<A: FusedIterator, B: FusedIterator> FusedIterator for Either<A, B> {}
+
+#[repr(transparent)]
+pub struct LRIter<A, B> (Either<A, B>);
+
+impl<T, A: Iterator<Item = T>, B: Iterator<Item = T>> LRIter<A, B> {
+    #[inline(always)]
+    pub const fn new (iter: Either<A,B>) -> Self {
+        Self(iter)
+    }
+
+    #[inline(always)]
+    pub const fn into_inner (self) -> Either<A, B> {
+        self.0
+    }
+}
+
+impl<T, A: Iterator<Item = T>, B: Iterator<Item = T>> Iterator for LRIter<A, B> {
+    type Item = T;
+
+    #[inline(always)]
+    fn next(&mut self) -> Option<Self::Item> {
+        match self {
+            Left(x) => x.next(),
+            Right(x) => x.next()
+        }
+    }
+
+    #[inline(always)]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        match self {
+            Left(x) => x.size_hint(),
+            Right(x) => x.size_hint()
+        }
+    }
+}
+
+impl<T, A: ExactSizeIterator<Item = T>, B: ExactSizeIterator<Item = T>> ExactSizeIterator for LRIter<A, B> {
+    #[inline(always)]
+    fn len(&self) -> usize {
+        match self {
+            Left(x) => x.len(),
+            Right(x) => x.len()
+        }
+    }
+}
+
+impl<A: DoubleEndedIterator, B: DoubleEndedIterator> DoubleEndedIterator for Either<A, B> {
+    #[inline(always)]
+    fn next_back(&mut self) -> Option<Self::Item> {
+        match self {
+            Left(x) => x.next_back().map(Left),
+            Right(x) => x.next_back().map(Right)
+        }
     }
 }
 
