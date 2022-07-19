@@ -14,6 +14,16 @@ cfg_if::cfg_if! {
 /// Borrowed or owned
 pub type Boo<'a, T> = Either<&'a T, T>;
 
+impl<'a, T> Boo<'a, T> {
+    #[inline(always)]
+    pub fn as_inner_ref (&self) -> &T {
+        match self {
+            Left(x) => *x,
+            Right(x) => x
+        }
+    }
+}
+
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
 #[cfg(any(feature = "std", feature = "alloc"))]
 impl<A, B> Either<Box<A>, Box<B>> {

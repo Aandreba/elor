@@ -1,6 +1,5 @@
 use futures::{Future, FutureExt, Stream, StreamExt};
 use core::ops::*;
-use core::hint::unreachable_unchecked;
 use crate::prelude::*;
 
 #[cfg_attr(docsrs, doc(cfg(feature = "async")))]

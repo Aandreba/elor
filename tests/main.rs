@@ -43,3 +43,12 @@ fn split_arc () {
 
     handle.join().unwrap();
 }
+
+#[test]
+fn iter () {
+    let iter : Either<std::iter::Empty<f32>, std::vec::IntoIter<f32>> = Right(Vec::into_iter(vec![1., 2., 3.]));
+    
+    for i in iter.into_same_iter() {
+        println!("{i}")
+    }
+}

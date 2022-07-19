@@ -2,7 +2,7 @@
 [![Crate](https://img.shields.io/crates/v/elor.svg)](https://crates.io/crates/elor)
 [![API](https://docs.rs/elor/badge.svg)](https://docs.rs/elor)
 
-elor is a ```no_std``` Rust crate with only one simple type; **```Either```**.
+elor is a ```no_std``` Rust crate with one simple type; **```Either```**.
 It represents a value that's of one type or another, and implements various functionalities depending on
 the attributes of those types
 

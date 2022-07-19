@@ -8,5 +8,11 @@
 - Added ```EitherIter``` trait
 - Extended documentation
 
+# 1.1.2
+- Added ```LRIter```
+- Implemented ```Iterator```, ```ExactSizeIterator```, ```DoubleSizedIterator``` and ```FusedIterator```
+- Added ```size_hint``` to ```EitherIter``` iterators
+- Added ```as_inner_ref``` to ```Boo```
+
 # 1.2 (Roadmap)
 - Add ```EitherStream```

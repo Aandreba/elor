@@ -58,6 +58,14 @@ impl<A: FusedIterator, B: FusedIterator> FusedIterator for Either<A, B> {}
 #[repr(transparent)]
 pub struct LRIter<A, B> (Either<A, B>);
 
+impl<T, A: Iterator<Item = T>, B: Iterator<Item = T>> Either<A, B> {
+    /// Turns an [`Either`] object with iterators with the same [`Iterator::Item`] into an iterator
+    #[inline(always)]
+    pub fn into_same_iter (self) -> LRIter<A, B> {
+        LRIter::new(self)
+    }
+}
+
 impl<T, A: Iterator<Item = T>, B: Iterator<Item = T>> LRIter<A, B> {
     #[inline(always)]
     pub const fn new (iter: Either<A,B>) -> Self {
@@ -65,7 +73,7 @@ impl<T, A: Iterator<Item = T>, B: Iterator<Item = T>> LRIter<A, B> {
     }
 
     #[inline(always)]
-    pub const fn into_inner (self) -> Either<A, B> {
+    pub fn into_inner (self) -> Either<A, B> {
         self.0
     }
 }
@@ -75,7 +83,7 @@ impl<T, A: Iterator<Item = T>, B: Iterator<Item = T>> Iterator for LRIter<A, B> 
 
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
-        match self {
+        match &mut self.0 {
             Left(x) => x.next(),
             Right(x) => x.next()
         }
@@ -83,7 +91,7 @@ impl<T, A: Iterator<Item = T>, B: Iterator<Item = T>> Iterator for LRIter<A, B> 
 
     #[inline(always)]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        match self {
+        match &self.0 {
             Left(x) => x.size_hint(),
             Right(x) => x.size_hint()
         }
@@ -93,19 +101,19 @@ impl<T, A: Iterator<Item = T>, B: Iterator<Item = T>> Iterator for LRIter<A, B> 
 impl<T, A: ExactSizeIterator<Item = T>, B: ExactSizeIterator<Item = T>> ExactSizeIterator for LRIter<A, B> {
     #[inline(always)]
     fn len(&self) -> usize {
-        match self {
+        match &self.0 {
             Left(x) => x.len(),
             Right(x) => x.len()
         }
     }
 }
 
-impl<A: DoubleEndedIterator, B: DoubleEndedIterator> DoubleEndedIterator for Either<A, B> {
+impl<T, A: DoubleEndedIterator<Item = T>, B: DoubleEndedIterator<Item = T>> DoubleEndedIterator for LRIter<A, B> {
     #[inline(always)]
     fn next_back(&mut self) -> Option<Self::Item> {
-        match self {
-            Left(x) => x.next_back().map(Left),
-            Right(x) => x.next_back().map(Right)
+        match &mut self.0 {
+            Left(x) => x.next_back(),
+            Right(x) => x.next_back()
         }
     }
 }
@@ -207,6 +215,19 @@ cfg_if::cfg_if! {
 
                 None
             }
+
+            #[inline(always)]
+            fn size_hint (&self) -> (usize, Option<usize>) {
+                let (mut min, mut max) = self.inner.borrow().size_hint();
+                let len = self.this.borrow().len();
+
+                min += len;
+                if let Some(ref mut max) = max {
+                    *max += len
+                }
+                
+                (min, max)
+            }
         }
 
         impl<I, A, B> Clone for SplitLeft<I, A, B> {
@@ -243,6 +264,19 @@ cfg_if::cfg_if! {
                 }
 
                 None
+            }
+
+            #[inline(always)]
+            fn size_hint (&self) -> (usize, Option<usize>) {
+                let (mut min, mut max) = self.inner.borrow().size_hint();
+                let len = self.this.borrow().len();
+
+                min += len;
+                if let Some(ref mut max) = max {
+                    *max += len
+                }
+                
+                (min, max)
             }
         }
 
@@ -299,6 +333,24 @@ cfg_if::cfg_if! {
 
                 None
             }
+
+            #[inline(always)]
+            fn size_hint (&self) -> (usize, Option<usize>) {
+                let inner = lock_deep(&self.inner);
+                let (mut min, mut max) = inner.size_hint();
+                drop(inner);
+
+                let this = lock_deep(&self.this);
+                let len = this.len();
+                drop(this);
+
+                min += len;
+                if let Some(ref mut max) = max {
+                    *max += len
+                }
+                
+                (min, max)
+            }
         }
 
         impl<I, A, B> Clone for SplitLeftArc<I, A, B> {
@@ -349,6 +401,24 @@ cfg_if::cfg_if! {
                 }
 
                 None
+            }
+
+            #[inline(always)]
+            fn size_hint (&self) -> (usize, Option<usize>) {
+                let inner = lock_deep(&self.inner);
+                let (mut min, mut max) = inner.size_hint();
+                drop(inner);
+
+                let this = lock_deep(&self.this);
+                let len = this.len();
+                drop(this);
+
+                min += len;
+                if let Some(ref mut max) = max {
+                    *max += len
+                }
+                
+                (min, max)
             }
         }
 
