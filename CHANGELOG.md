@@ -14,5 +14,8 @@
 - Added ```size_hint``` to ```EitherIter``` iterators
 - Added ```as_inner_ref``` to ```Boo```
 
-# 1.2 (Roadmap)
+# 1.1.3
+-  Added `ok_left` and `ok_right`
+
+# Roadmap
 - Add ```EitherStream```

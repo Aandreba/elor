@@ -194,6 +194,24 @@ impl<A,B> Either<A,B> {
         }
     }
 
+    /// Returns `Ok` if the value is on the left, otherwise returning an `Err` with the right-side value.
+    #[inline(always)]
+    pub fn ok_left (self) -> Result<A, B> {
+        match self {
+            Self::Left(x) => Ok(x),
+            Self::Right(e) => Err(e)
+        }
+    }
+
+    /// Returns `Ok` if the value is on the right, otherwise returning an `Err` with the left-side value.
+    #[inline(always)]
+    pub fn ok_right (self) -> Result<B, A> {
+        match self {
+            Self::Right(x) => Ok(x),
+            Self::Left(e) => Err(e)
+        }
+    }
+
     #[deprecated(since = "1.1.0", note = "use ```left``` instead")]
     #[inline(always)]
     pub fn some_left (self) -> Option<A> {
