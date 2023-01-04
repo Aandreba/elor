@@ -10,6 +10,7 @@ mod lr;
 pub use lr::*;
 
 mod refr;
+use pin_project::pin_project;
 pub use refr::*;
 
 /// Iterator extensions
@@ -56,12 +57,13 @@ use self::Either::*;
 
 /// Generic data type that represents either a value
 /// that's of one type or another.
+#[pin_project(project = EitherProj)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd)]
 #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serialize", serde(untagged))]
 pub enum Either<A,B> {
-    Left(A),
-    Right(B)
+    Left (#[pin] A),
+    Right (#[pin] B)
 }
 
 impl<A,B> Either<A,B> {

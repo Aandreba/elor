@@ -17,5 +17,8 @@
 # 1.1.3
 -  Added `ok_left` and `ok_right`
 
+# 1.1.4
+- Removed `Unpin` requirement to implement `Future` and `Stream`
+
 # Roadmap
 - Add ```EitherStream```
